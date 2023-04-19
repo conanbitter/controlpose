@@ -7,7 +7,7 @@ class PoseCanvas : Control
 
     public PoseCanvas()
     {
-        pen.Width = 4;
+        pen.Width = 8;
         this.DoubleBuffered = true;
         fig = new Figure();
         fig.ResetPose();
@@ -26,21 +26,21 @@ class PoseCanvas : Control
         for (int i = 0; i < Figure.pairs.Length; i++)
         {
             var pair = Figure.pairs[i];
-            pen.Color = Figure.pointColors[i + 1];
-            pen.Color = Color.FromArgb(128, Figure.pointColors[i + 1]);
+            pen.Color = Figure.pointColors[i];
+            pen.Color = Color.FromArgb(153, pen.Color);
             e.Graphics.DrawLine(
                 pen,
-                fig.points[pair.Item1].x * 512,
-                fig.points[pair.Item1].y * 512,
-                fig.points[pair.Item2].x * 512,
-                fig.points[pair.Item2].y * 512);
+                fig.points[pair.Item1].x * 1024,
+                fig.points[pair.Item1].y * 1024,
+                fig.points[pair.Item2].x * 1024,
+                fig.points[pair.Item2].y * 1024);
         }
         for (int i = 0; i < fig.points.Length; i++)
         {
             brush.Color = Figure.pointColors[i];
-            brush.Color = Color.FromArgb(128, Figure.pointColors[i]);
+            brush.Color = Color.FromArgb(153, brush.Color);
             FigurePoint point = fig.points[i];
-            e.Graphics.FillEllipse(brush, point.x * 512 - 3, point.y * 512 - 3, 6, 6);
+            e.Graphics.FillEllipse(brush, point.x * 1024 - 8, point.y * 1024 - 8, 16, 16);
         }
     }
 

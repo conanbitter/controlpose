@@ -34,7 +34,7 @@ class Figure
         new FigurePoint(0.541482f, 0.100249f)
     };
 
-    public static Color[] pointColors = new Color[18]{
+    /*public static Color[] pointColors = new Color[18]{
         Color.FromArgb(255,   0,  85),
         Color.FromArgb(255,   0,   0),
         Color.FromArgb(255,  85,   0),
@@ -53,6 +53,26 @@ class Figure
         Color.FromArgb(170,   0, 255),
         Color.FromArgb(255,   0, 255),
         Color.FromArgb(85,    0, 255)
+    };*/
+    public static Color[] pointColors = new Color[18]{
+        Color.FromArgb(255,   0,   0),
+        Color.FromArgb(255,  85,   0),
+        Color.FromArgb(255, 170,   0),
+        Color.FromArgb(255, 255,   0),
+        Color.FromArgb(170, 255,   0),
+        Color.FromArgb( 85, 255,   0),
+        Color.FromArgb(  0, 255,   0),
+        Color.FromArgb(  0, 255,  85),
+        Color.FromArgb(  0, 255, 170),
+        Color.FromArgb(  0, 255, 255),
+        Color.FromArgb(  0, 170, 255),
+        Color.FromArgb(  0,  85, 255),
+        Color.FromArgb(  0,   0, 255),
+        Color.FromArgb(85,    0, 255),
+        Color.FromArgb(170,   0, 255),
+        Color.FromArgb(255,   0, 170),
+        Color.FromArgb(255,   0, 255),
+        Color.FromArgb(255,   0,  85),
     };
 
     public static (int, int)[] pairs = new (int, int)[]{
