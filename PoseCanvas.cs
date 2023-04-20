@@ -52,9 +52,21 @@ class PoseCanvas : Control
         offsetY = (y * (k - 1) + offsetY) * (1 / k);
     }
 
-    private void ResetCamera()
+    public void ResetCamera()
     {
-
+        if (canvasWidthF / canvasHeightF < (double)Width / (double)(Height))
+        {
+            scale = canvasHeightF / (double)Height;
+            offsetX = (Width - canvasWidthF / scale) / 2;
+            offsetY = 0;
+        }
+        else
+        {
+            scale = canvasWidthF / (double)Width;
+            offsetX = 0;
+            offsetY = (Height - canvasHeightF / scale) / 2;
+        }
+        Invalidate();
     }
 
     protected override void OnResize(EventArgs e)
@@ -62,7 +74,7 @@ class PoseCanvas : Control
         base.OnResize(e);
         if (initialResize)
         {
-            //offset = new Vector2D((double)Width / 2, (double)Height / 2);
+            ResetCamera();
             initialResize = false;
             oldSize = this.Size;
         }
@@ -80,6 +92,8 @@ class PoseCanvas : Control
         base.OnPaint(e);
         e.Graphics.Clear(BackgroundColor);
         e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+        brush.Color = Color.Black;
+        e.Graphics.FillRectangle(brush, (int)offsetX, (int)offsetY, (int)(canvasWidthF / scale), (int)(canvasHeightF / scale));
         for (int i = 0; i < Figure.pairs.Length; i++)
         {
             var pair = Figure.pairs[i];
