@@ -1,4 +1,4 @@
-struct FigurePoint
+public struct FigurePoint
 {
     public float x;
     public float y;
@@ -11,7 +11,7 @@ struct FigurePoint
     }
 }
 
-class Figure
+public class Figure
 {
     static FigurePoint[] defaultPose = new FigurePoint[18]{
         new FigurePoint(0.500000f, 0.106655f),

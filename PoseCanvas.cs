@@ -1,9 +1,10 @@
 class PoseCanvas : Control
 {
+    const double ZoomStep = 0.9;
+
     private static Color BackgroundColor = Color.FromArgb(40, 40, 40);
     private SolidBrush brush = new SolidBrush(Color.White);
     private Pen pen = new Pen(Color.White);
-    private Figure fig;
 
     private double offsetX = 0;
     private double offsetY = 0;
@@ -18,19 +19,13 @@ class PoseCanvas : Control
     private bool initialResize = true;
     private Size oldSize = Size.Empty;
 
-    private int canvasWidth = 512;
-    private int canvasHeight = 512;
-    private double canvasWidthF = 1.0;
-    private double canvasHeightF = 1.0;
+    public ProjectData project;
 
-    const double ZoomStep = 0.9;
-
-    public PoseCanvas()
+    public PoseCanvas(ProjectData data)
     {
         pen.Width = 8;
         this.DoubleBuffered = true;
-        fig = new Figure();
-        fig.ResetPose();
+        project = data;
     }
 
     public (double, double) ScreenToWorld(int x, int y)
@@ -54,17 +49,17 @@ class PoseCanvas : Control
 
     public void ResetCamera()
     {
-        if (canvasWidthF / canvasHeightF < (double)Width / (double)(Height))
+        if (project.canvasFloatWidth / project.canvasFloatHeight < (double)Width / (double)(Height))
         {
-            scale = canvasHeightF / (double)Height;
-            offsetX = (Width - canvasWidthF / scale) / 2;
+            scale = project.canvasFloatHeight / (double)Height;
+            offsetX = (Width - project.canvasFloatWidth / scale) / 2;
             offsetY = 0;
         }
         else
         {
-            scale = canvasWidthF / (double)Width;
+            scale = project.canvasFloatWidth / (double)Width;
             offsetX = 0;
-            offsetY = (Height - canvasHeightF / scale) / 2;
+            offsetY = (Height - project.canvasFloatHeight / scale) / 2;
         }
         Invalidate();
     }
@@ -93,7 +88,16 @@ class PoseCanvas : Control
         e.Graphics.Clear(BackgroundColor);
         e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
         brush.Color = Color.Black;
-        e.Graphics.FillRectangle(brush, (int)offsetX, (int)offsetY, (int)(canvasWidthF / scale), (int)(canvasHeightF / scale));
+
+        e.Graphics.FillRectangle(
+            brush,
+            (int)offsetX,
+            (int)offsetY,
+            (int)(project.canvasFloatWidth / scale),
+            (int)(project.canvasFloatHeight / scale));
+
+        Figure fig = project.figure;
+
         for (int i = 0; i < Figure.pairs.Length; i++)
         {
             var pair = Figure.pairs[i];
@@ -109,6 +113,7 @@ class PoseCanvas : Control
                 point2.Item2
                 );
         }
+
         for (int i = 0; i < fig.points.Length; i++)
         {
             brush.Color = Figure.pointColors[i];

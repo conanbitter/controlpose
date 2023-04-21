@@ -15,7 +15,7 @@ partial class MainForm
         this.Text = "ControlPose";
         this.Name = "ControlPose";
 
-        pcCanvas = new PoseCanvas();
+        pcCanvas = new PoseCanvas(project);
         pcCanvas.Dock = DockStyle.Fill;
         this.Controls.Add(pcCanvas);
 
