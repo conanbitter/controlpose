@@ -1,10 +1,12 @@
 class PoseCanvas : Control
 {
     const double ZoomStep = 0.9;
+    const double MinSelectDistance = 1.0;
 
     private static Color BackgroundColor = Color.FromArgb(40, 40, 40);
     private SolidBrush brush = new SolidBrush(Color.White);
     private Pen pen = new Pen(Color.White);
+    private Pen selPen = new Pen(Color.White);
 
     private double offsetX = 0;
     private double offsetY = 0;
@@ -12,18 +14,27 @@ class PoseCanvas : Control
 
     private double offsetXold = 0;
     private double offsetYold = 0;
-    private bool dragging = false;
+    private bool cameraMoving = false;
     private int oldx = 0;
     private int oldy = 0;
 
+    private bool pointMoving = false;
+    private double oldPointX = 0.0;
+    private double oldPointY = 0.0;
+    private double oldCursorX = 0.0;
+    private double oldCursorY = 0.0;
+
     private bool initialResize = true;
     private Size oldSize = Size.Empty;
+
+    private int selection = 3;
 
     public ProjectData project;
 
     public PoseCanvas(ProjectData data)
     {
         pen.Width = 8;
+        selPen.Width = 2;
         this.DoubleBuffered = true;
         project = data;
     }
@@ -121,8 +132,11 @@ class PoseCanvas : Control
             e.Graphics.FillEllipse(brush, point.Item1 - 8, point.Item2 - 8, 16, 16);
         }
 
-        brush.Color = Color.White;
-        e.Graphics.FillEllipse(brush, (int)offsetX - 8, (int)offsetY - 8, 16, 16);
+        if (selection >= 0)
+        {
+            var selPoint = WorldToScreen(fig.points[selection].x, fig.points[selection].y);
+            e.Graphics.DrawEllipse(selPen, selPoint.Item1 - 10, selPoint.Item2 - 10, 20, 20);
+        }
     }
 
     protected override void OnMouseDown(MouseEventArgs e)
@@ -130,27 +144,54 @@ class PoseCanvas : Control
         base.OnMouseDown(e);
         if (e.Button == MouseButtons.Middle)
         {
-            dragging = true;
+            cameraMoving = true;
             oldx = e.X;
             oldy = e.Y;
             offsetXold = offsetX;
             offsetYold = offsetY;
         }
-        else
+        else if (e.Button == MouseButtons.Right)
         {
-
+            pointMoving = true;
+            Cursor.Hide();
+            (oldCursorX, oldCursorY) = ScreenToWorld(e.X, e.Y);
+            oldPointX = project.figure.points[selection].x;
+            oldPointY = project.figure.points[selection].y;
+        }
+        else if (e.Button == MouseButtons.Left)
+        {
+            selection = -1;
+            (double cursorX, double cursorY) = ScreenToWorld(e.X, e.Y);
+            double minDist = MinSelectDistance;
+            for (int i = 0; i < project.figure.points.Length; i++)
+            {
+                double x = project.figure.points[i].x;
+                double y = project.figure.points[i].y;
+                double dist = ((cursorX - x) * (cursorX - x) + (cursorY - y) * (cursorY - y)) / scale;
+                if (dist < minDist)
+                {
+                    minDist = dist;
+                    selection = i;
+                }
+            }
+            Invalidate();
         }
     }
 
     protected override void OnMouseMove(MouseEventArgs e)
     {
         base.OnMouseMove(e);
-        if (dragging)
+        if (cameraMoving)
         {
-            int dx = e.X - oldx;
-            int dy = e.Y - oldy;
             offsetX = offsetXold + e.X - oldx;
             offsetY = offsetYold + e.Y - oldy;
+            Invalidate();
+        }
+        if (pointMoving)
+        {
+            (double newCursorX, double newCursorY) = ScreenToWorld(e.X, e.Y);
+            project.figure.points[selection].x = oldPointX + newCursorX - oldCursorX;
+            project.figure.points[selection].y = oldPointY + newCursorY - oldCursorY;
             Invalidate();
         }
     }
@@ -158,7 +199,15 @@ class PoseCanvas : Control
     protected override void OnMouseUp(MouseEventArgs e)
     {
         base.OnMouseUp(e);
-        dragging = false;
+        if (e.Button == MouseButtons.Middle)
+        {
+            cameraMoving = false;
+        }
+        else if (e.Button == MouseButtons.Right)
+        {
+            pointMoving = false;
+            Cursor.Show();
+        }
     }
 
     protected override void OnMouseWheel(MouseEventArgs e)
