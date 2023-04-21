@@ -1,10 +1,10 @@
 public struct FigurePoint
 {
-    public float x;
-    public float y;
+    public double x;
+    public double y;
     public bool enabled = true;
 
-    public FigurePoint(float x, float y)
+    public FigurePoint(double x, double y)
     {
         this.x = x;
         this.y = y;
@@ -14,24 +14,24 @@ public struct FigurePoint
 public class Figure
 {
     static FigurePoint[] defaultPose = new FigurePoint[18]{
-        new FigurePoint(0.500000f, 0.106655f),
-        new FigurePoint(0.500000f, 0.203995f),
-        new FigurePoint(0.416019f, 0.207901f),
-        new FigurePoint(0.385863f, 0.352740f),
-        new FigurePoint(0.345865f, 0.472736f),
-        new FigurePoint(0.583981f, 0.207901f),
-        new FigurePoint(0.614137f, 0.352740f),
-        new FigurePoint(0.654135f, 0.472736f),
-        new FigurePoint(0.445861f, 0.467111f),
-        new FigurePoint(0.423987f, 0.688353f),
-        new FigurePoint(0.413987f, 0.911469f),
-        new FigurePoint(0.554139f, 0.467111f),
-        new FigurePoint(0.576013f, 0.688353f),
-        new FigurePoint(0.586013f, 0.911469f),
-        new FigurePoint(0.482892f, 0.088531f),
-        new FigurePoint(0.517108f, 0.088531f),
-        new FigurePoint(0.458518f, 0.100249f),
-        new FigurePoint(0.541482f, 0.100249f)
+        new FigurePoint( 0.000000, -0.393345),
+        new FigurePoint( 0.000000, -0.296005),
+        new FigurePoint(-0.083981, -0.292099),
+        new FigurePoint(-0.114137, -0.147260),
+        new FigurePoint(-0.154135, -0.027264),
+        new FigurePoint( 0.083981, -0.292099),
+        new FigurePoint( 0.114137, -0.147260),
+        new FigurePoint( 0.154135, -0.027264),
+        new FigurePoint(-0.054139, -0.032889),
+        new FigurePoint(-0.076013,  0.188353),
+        new FigurePoint(-0.086013,  0.411469),
+        new FigurePoint( 0.054139, -0.032889),
+        new FigurePoint( 0.076013,  0.188353),
+        new FigurePoint( 0.086013,  0.411469),
+        new FigurePoint(-0.017108, -0.411469),
+        new FigurePoint( 0.017108, -0.411469),
+        new FigurePoint(-0.041482, -0.399751),
+        new FigurePoint( 0.041482, -0.399751)
     };
 
     /*public static Color[] pointColors = new Color[18]{

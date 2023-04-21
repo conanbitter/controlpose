@@ -52,15 +52,13 @@ class PoseCanvas : Control
         if (project.canvasFloatWidth / project.canvasFloatHeight < (double)Width / (double)(Height))
         {
             scale = project.canvasFloatHeight / (double)Height;
-            offsetX = (Width - project.canvasFloatWidth / scale) / 2;
-            offsetY = 0;
         }
         else
         {
             scale = project.canvasFloatWidth / (double)Width;
-            offsetX = 0;
-            offsetY = (Height - project.canvasFloatHeight / scale) / 2;
         }
+        offsetX = Width / 2;
+        offsetY = Height / 2;
         Invalidate();
     }
 
@@ -89,10 +87,11 @@ class PoseCanvas : Control
         e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
         brush.Color = Color.Black;
 
+        (int canvasOffsetX, int canvasOffsetY) = WorldToScreen(0.5 - project.canvasFloatWidth, 0.5 - project.canvasFloatHeight);
         e.Graphics.FillRectangle(
             brush,
-            (int)offsetX,
-            (int)offsetY,
+            canvasOffsetX,
+            canvasOffsetY,
             (int)(project.canvasFloatWidth / scale),
             (int)(project.canvasFloatHeight / scale));
 
@@ -121,6 +120,9 @@ class PoseCanvas : Control
             var point = WorldToScreen(fig.points[i].x, fig.points[i].y);
             e.Graphics.FillEllipse(brush, point.Item1 - 8, point.Item2 - 8, 16, 16);
         }
+
+        brush.Color = Color.White;
+        e.Graphics.FillEllipse(brush, (int)offsetX - 8, (int)offsetY - 8, 16, 16);
     }
 
     protected override void OnMouseDown(MouseEventArgs e)
