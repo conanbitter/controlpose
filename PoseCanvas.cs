@@ -27,7 +27,7 @@ class PoseCanvas : Control
     private bool initialResize = true;
     private Size oldSize = Size.Empty;
 
-    private int selection = 3;
+    private int selection = -1;
 
     public ProjectData project;
 
@@ -111,6 +111,10 @@ class PoseCanvas : Control
         for (int i = 0; i < Figure.pairs.Length; i++)
         {
             var pair = Figure.pairs[i];
+            if (!fig.points[pair.Item1].enabled || !fig.points[pair.Item2].enabled)
+            {
+                continue;
+            }
             pen.Color = Figure.pointColors[i];
             pen.Color = Color.FromArgb(153, pen.Color);
             var point1 = WorldToScreen(fig.points[pair.Item1].x, fig.points[pair.Item1].y);
@@ -126,6 +130,10 @@ class PoseCanvas : Control
 
         for (int i = 0; i < fig.points.Length; i++)
         {
+            if (!fig.points[i].enabled)
+            {
+                continue;
+            }
             brush.Color = Figure.pointColors[i];
             brush.Color = Color.FromArgb(153, brush.Color);
             var point = WorldToScreen(fig.points[i].x, fig.points[i].y);
@@ -150,7 +158,7 @@ class PoseCanvas : Control
             offsetXold = offsetX;
             offsetYold = offsetY;
         }
-        else if (e.Button == MouseButtons.Right)
+        else if (e.Button == MouseButtons.Right && selection >= 0)
         {
             pointMoving = true;
             Cursor.Hide();
@@ -158,13 +166,17 @@ class PoseCanvas : Control
             oldPointX = project.figure.points[selection].x;
             oldPointY = project.figure.points[selection].y;
         }
-        else if (e.Button == MouseButtons.Left)
+        else if (e.Button == MouseButtons.Left && !pointMoving)
         {
             selection = -1;
             (double cursorX, double cursorY) = ScreenToWorld(e.X, e.Y);
             double minDist = MinSelectDistance;
             for (int i = 0; i < project.figure.points.Length; i++)
             {
+                if (!project.figure.points[i].enabled)
+                {
+                    continue;
+                }
                 double x = project.figure.points[i].x;
                 double y = project.figure.points[i].y;
                 double dist = ((cursorX - x) * (cursorX - x) + (cursorY - y) * (cursorY - y)) / scale;
@@ -224,5 +236,24 @@ class PoseCanvas : Control
             scale /= ZoomStep;
         }
         Invalidate();
+    }
+
+    protected override void OnKeyDown(KeyEventArgs e)
+    {
+        base.OnKeyDown(e);
+        if (e.KeyCode == Keys.H && selection >= 0)
+        {
+            project.figure.points[selection].enabled = false;
+            selection = -1;
+            Invalidate();
+        }
+        else if (e.KeyCode == Keys.J)
+        {
+            for (int i = 0; i < project.figure.points.Length; i++)
+            {
+                project.figure.points[i].enabled = true;
+            }
+            Invalidate();
+        }
     }
 }
