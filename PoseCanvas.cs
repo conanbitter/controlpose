@@ -119,13 +119,24 @@ class PoseCanvas : Control
             pen.Color = Color.FromArgb(153, pen.Color);
             var point1 = WorldToScreen(fig.points[pair.Item1].x, fig.points[pair.Item1].y);
             var point2 = WorldToScreen(fig.points[pair.Item2].x, fig.points[pair.Item2].y);
+            brush.Color = pen.Color;
+            double angle, length, dx, dy;
+            dx = point2.Item1 - point1.Item1;
+            dy = point2.Item2 - point1.Item2;
+            angle = Math.Atan2(dy, dx) * (180.0 / Math.PI);
+            length = Math.Sqrt(dx * dx + dy * dy);
+            e.Graphics.TranslateTransform(point1.Item1, point1.Item2);
+            e.Graphics.RotateTransform((float)angle);
+            e.Graphics.FillEllipse(brush, 0.0f, -5.0f, (float)length, 10.0f);
+            e.Graphics.ResetTransform();
+            /*
             e.Graphics.DrawLine(
                 pen,
                 point1.Item1,
                 point1.Item2,
                 point2.Item1,
                 point2.Item2
-                );
+                );*/
         }
 
         for (int i = 0; i < fig.points.Length; i++)
