@@ -5,6 +5,7 @@ partial class MainForm
     private PoseCanvas pcCanvas;
     private Panel pToolBox;
     private Button bCameraReset;
+    private Button bRender;
 
     private void InitializeComponent()
     {
@@ -30,6 +31,13 @@ partial class MainForm
         bCameraReset.Text = "Reset Camera";
         bCameraReset.Click += (object sender, System.EventArgs e) => pcCanvas.ResetCamera();
         pToolBox.Controls.Add(bCameraReset);
+
+        bRender = new Button();
+        bRender.Size = new Size(100, 40);
+        bRender.Location = new Point(30, 80);
+        bRender.Text = "Render";
+        bRender.Click += new EventHandler(RenderImage);
+        pToolBox.Controls.Add(bRender);
 
         this.ResumeLayout(false);
     }
