@@ -1,3 +1,6 @@
+public delegate void VisibilityChangedEventHandler(object sender, Figure figure);
+public delegate void SelectionChangedEventHandler(object sender, int index);
+
 class PoseCanvas : Control
 {
     const double ZoomStep = 0.9;
@@ -27,9 +30,12 @@ class PoseCanvas : Control
     private bool initialResize = true;
     private Size oldSize = Size.Empty;
 
-    private int selection = -1;
+    public int selection = -1;
 
     public ProjectData project;
+
+    public event VisibilityChangedEventHandler? VisibilityChanged;
+    public event SelectionChangedEventHandler? SelectionChanged;
 
     public PoseCanvas(ProjectData data)
     {
@@ -186,6 +192,10 @@ class PoseCanvas : Control
                     selection = i;
                 }
             }
+            if (SelectionChanged != null)
+            {
+                SelectionChanged(this, selection);
+            }
             Invalidate();
         }
     }
@@ -245,6 +255,10 @@ class PoseCanvas : Control
         {
             project.figure.points[selection].enabled = false;
             selection = -1;
+            if (VisibilityChanged != null)
+            {
+                VisibilityChanged(this, project.figure);
+            }
             Invalidate();
         }
         else if (e.KeyCode == Keys.J)
@@ -252,6 +266,10 @@ class PoseCanvas : Control
             for (int i = 0; i < project.figure.points.Length; i++)
             {
                 project.figure.points[i].enabled = true;
+            }
+            if (VisibilityChanged != null)
+            {
+                VisibilityChanged(this, project.figure);
             }
             Invalidate();
         }

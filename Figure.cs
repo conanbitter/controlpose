@@ -34,6 +34,27 @@ public class Figure
         new FigurePoint( 0.041482, -0.399751)
     };
 
+    static public string[] pointNames = {
+        "Nose",
+        "Neck",
+        "Right Shoulder",
+        "Right Elbow",
+        "Right Wrist",
+        "Left Shoulder",
+        "Left Elbow",
+        "Left Wrist",
+        "Right Hip",
+        "Right Knee",
+        "Right Ankle",
+        "Left Hip",
+        "Left Knee",
+        "Left Ankle",
+        "Right Eye",
+        "Left Eye",
+        "Right Ear",
+        "Left Ear"
+    };
+
     /*public static Color[] pointColors = new Color[18]{
         Color.FromArgb(255,   0,  85),
         Color.FromArgb(255,   0,   0),
