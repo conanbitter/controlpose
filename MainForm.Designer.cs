@@ -51,19 +51,25 @@ partial class MainForm
         pToolBox.Controls.Add(bRender);
 
         lvPoints = new ListView();
-        lvPoints.View = View.List;
+        lvPoints.View = View.Details;
+        lvPoints.GridLines = true;
+        lvPoints.Columns.Add("Name", 115);
+        lvPoints.HeaderStyle = ColumnHeaderStyle.None;
         lvPoints.CheckBoxes = true;
         lvPoints.FullRowSelect = true;
         lvPoints.MultiSelect = false;
         for (int i = 0; i < Figure.pointNames.Length; i++)
-        //foreach (string name in Figure.pointNames)
         {
             ListViewItem item = new ListViewItem(Figure.pointNames[i]);
             item.Checked = true;
             item.BackColor = ColorBlend(Figure.pointColors[i], item.BackColor, 0.3);
             lvPoints.Items.Add(item);
         }
-        lvPoints.Size = new Size(120, 400);
+        lvPoints.Width = 120;
+        lvPoints.ClientSize = new Size(
+            lvPoints.ClientSize.Width,
+            lvPoints.Items[17].Bounds.Bottom
+        );
         lvPoints.Location = new Point(30, 130);
         lvPoints.ItemChecked += new ItemCheckedEventHandler(ApplyVisibilityToFigure);
         lvPoints.SelectedIndexChanged += new EventHandler(ApplySelectionToFigure);
