@@ -27,8 +27,8 @@ partial class MainForm
 
         pcCanvas = new PoseCanvas(project);
         pcCanvas.Dock = DockStyle.Fill;
-        pcCanvas.VisibilityChanged += ApplyFigureVisibilityToList;
-        pcCanvas.SelectionChanged += ApplyFigureSelectionToList;
+        pcCanvas.VisibilityChanged += UpdateListVisibility;
+        pcCanvas.SelectionChanged += UpdateListSelection;
         this.Controls.Add(pcCanvas);
 
         pToolBox = new Panel();
@@ -57,7 +57,7 @@ partial class MainForm
         lvPoints.HeaderStyle = ColumnHeaderStyle.None;
         lvPoints.CheckBoxes = true;
         lvPoints.FullRowSelect = true;
-        lvPoints.MultiSelect = false;
+        lvPoints.MultiSelect = true;
         for (int i = 0; i < Figure.pointNames.Length; i++)
         {
             ListViewItem item = new ListViewItem(Figure.pointNames[i]);
@@ -71,8 +71,8 @@ partial class MainForm
             lvPoints.Items[17].Bounds.Bottom
         );
         lvPoints.Location = new Point(30, 130);
-        lvPoints.ItemChecked += new ItemCheckedEventHandler(ApplyVisibilityToFigure);
-        lvPoints.SelectedIndexChanged += new EventHandler(ApplySelectionToFigure);
+        lvPoints.ItemChecked += new ItemCheckedEventHandler(UpdateCanvasVisibility);
+        lvPoints.SelectedIndexChanged += new EventHandler(UpdateCanvasSelection);
         pToolBox.Controls.Add(lvPoints);
 
         this.ResumeLayout(false);

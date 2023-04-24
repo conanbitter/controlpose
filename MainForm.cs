@@ -4,6 +4,8 @@ public partial class MainForm : Form
 {
     public ProjectData project;
 
+    bool selectionChanging = false;
+
     public MainForm()
     {
         project = new ProjectData();
@@ -25,7 +27,7 @@ public partial class MainForm : Form
         }
     }
 
-    public void ApplyFigureVisibilityToList(object sender, Figure figure)
+    public void UpdateListVisibility(object sender, Figure figure)
     {
         for (int i = 0; i < figure.points.Length; i++)
         {
@@ -33,38 +35,51 @@ public partial class MainForm : Form
         }
     }
 
-    public void ApplyFigureSelectionToList(object sender, int index)
+    public void UpdateListSelection(object sender, FigureMetadata metadata)
     {
-        lvPoints.SelectedIndices.Clear();
-        if (index >= 0)
+        selectionChanging = true;
+        for (int i = 0; i < metadata.points.Length; i++)
         {
-            lvPoints.Items[index].Selected = true;
+            lvPoints.Items[i].Selected = metadata.points[i].selected;
         }
         lvPoints.Select();
+        selectionChanging = false;
     }
 
-    public void ApplyVisibilityToFigure(object sender, System.Windows.Forms.ItemCheckedEventArgs e)
+    public void UpdateCanvasVisibility(object sender, System.Windows.Forms.ItemCheckedEventArgs e)
     {
+        bool selectionChanged = false;
         for (int i = 0; i < project.figure.points.Length; i++)
         {
+            if (!lvPoints.Items[i].Checked && pcCanvas.metadata.points[i].selected)
+            {
+                selectionChanged = true;
+                pcCanvas.metadata.points[i].selected = false;
+            }
             project.figure.points[i].enabled = lvPoints.Items[i].Checked;
+
         }
-        if (pcCanvas.selection >= 0 && !project.figure.points[pcCanvas.selection].enabled)
+        if (selectionChanged)
         {
-            pcCanvas.selection = -1;
+            UpdateListSelection(this, pcCanvas.metadata);
+            pcCanvas.Invalidate();
         }
-        pcCanvas.Invalidate();
+
     }
 
-    public void ApplySelectionToFigure(object sender, System.EventArgs e)
+    public void UpdateCanvasSelection(object sender, System.EventArgs e)
     {
-        if (lvPoints.SelectedIndices.Count > 0 && project.figure.points[lvPoints.SelectedIndices[0]].enabled)
+        if (selectionChanging)
         {
-            pcCanvas.selection = lvPoints.SelectedIndices[0];
+            return;
         }
-        else
+        for (int i = 0; i < pcCanvas.metadata.points.Length; i++)
         {
-            pcCanvas.selection = -1;
+            if (!project.figure.points[i].enabled)
+            {
+                lvPoints.Items[i].Selected = false;
+            }
+            pcCanvas.metadata.points[i].selected = lvPoints.Items[i].Selected;
         }
         pcCanvas.Invalidate();
     }
