@@ -80,6 +80,15 @@ class PoseCanvas : Control
     private double oldCursorX = 0.0;
     private double oldCursorY = 0.0;
 
+    private bool boxSelection = false;
+    private bool boxActive = false;
+    private double selX1 = 0;
+    private double selY1 = 0;
+    private double selX2 = 0;
+    private double selY2 = 0;
+    private int boxTop = 0, boxLeft = 0, boxWidth = 0, boxHeight = 0;
+    const int minBoxSize = 3;
+
     private bool initialResize = true;
     private Size oldSize = Size.Empty;
 
@@ -208,7 +217,12 @@ class PoseCanvas : Control
                 e.Graphics.DrawEllipse(selPen, selPoint.Item1 - 10, selPoint.Item2 - 10, 20, 20);
             }
         }
-        //e.Graphics.DrawRectangle(boxPen, 100, 100, 400, 200);
+
+        if (boxActive)
+        {
+            e.Graphics.DrawRectangle(boxPen, boxLeft, boxTop, boxWidth, boxHeight);
+            //e.Graphics.DrawRectangle(boxPen, 100, 100, 400, 400);
+        }
     }
 
     protected override void OnMouseDown(MouseEventArgs e)
@@ -228,6 +242,53 @@ class PoseCanvas : Control
             Cursor.Hide();
             (oldCursorX, oldCursorY) = ScreenToWorld(e.X, e.Y);
             metadata.CopyPos(project.figure);
+        }
+        else if (e.Button == MouseButtons.Left && !pointMoving)
+        {
+            (selX1, selY1) = ScreenToWorld(e.X, e.Y);
+            boxSelection = true;
+        }
+    }
+
+    private void RecalculateBox()
+    {
+        (int x1, int y1) = WorldToScreen(selX1, selY1);
+        (int x2, int y2) = WorldToScreen(selX2, selY2);
+        boxLeft = Math.Min(x1, x2);
+        boxTop = Math.Min(y1, y2);
+        boxWidth = Math.Abs(x2 - x1);
+        boxHeight = Math.Abs(y2 - y1);
+        boxActive = (boxWidth > minBoxSize) && (boxHeight > minBoxSize);
+        if (boxActive)
+        {
+            double boxBorder = 8.0 * scale;
+            double left = Math.Min(selX1, selX2) - boxBorder;
+            double right = Math.Max(selX1, selX2) + boxBorder;
+            double top = Math.Min(selY1, selY2) - boxBorder;
+            double bottom = Math.Max(selY1, selY2) + boxBorder;
+            for (int i = 0; i < project.figure.points.Length; i++)
+            {
+                if (!project.figure.points[i].enabled)
+                {
+                    continue;
+                }
+                bool selected = project.figure.points[i].x > left &&
+                    project.figure.points[i].x < right &&
+                    project.figure.points[i].y > top &&
+                    project.figure.points[i].y < bottom;
+                if (Control.ModifierKeys.HasFlag(Keys.Shift))
+                {
+                    metadata.points[i].selected = metadata.points[i].selected || selected;
+                }
+                else
+                {
+                    metadata.points[i].selected = selected;
+                }
+            }
+            if (SelectionChanged != null)
+            {
+                SelectionChanged(this, metadata);
+            }
         }
     }
 
@@ -253,6 +314,12 @@ class PoseCanvas : Control
             }
             Invalidate();
         }
+        if (boxSelection)
+        {
+            (selX2, selY2) = ScreenToWorld(e.X, e.Y);
+            RecalculateBox();
+            Invalidate();
+        }
     }
 
     protected override void OnMouseUp(MouseEventArgs e)
@@ -269,30 +336,38 @@ class PoseCanvas : Control
         }
         else if (e.Button == MouseButtons.Left && !pointMoving)
         {
-            if (!Control.ModifierKeys.HasFlag(Keys.Shift))
+            boxSelection = false;
+            if (boxActive)
             {
-                metadata.ClearSelection();
+                boxActive = false;
             }
-            (double cursorX, double cursorY) = ScreenToWorld(e.X, e.Y);
-            double minDist = MinSelectDistance;
-            for (int i = 0; i < project.figure.points.Length; i++)
+            else
             {
-                if (!project.figure.points[i].enabled)
+                if (!Control.ModifierKeys.HasFlag(Keys.Shift))
                 {
-                    continue;
+                    metadata.ClearSelection();
                 }
-                double x = project.figure.points[i].x;
-                double y = project.figure.points[i].y;
-                double dist = ((cursorX - x) * (cursorX - x) + (cursorY - y) * (cursorY - y)) / scale;
-                if (dist < minDist)
+                (double cursorX, double cursorY) = ScreenToWorld(e.X, e.Y);
+                double minDist = MinSelectDistance;
+                for (int i = 0; i < project.figure.points.Length; i++)
                 {
-                    minDist = dist;
-                    metadata.ToggleOne(i);
+                    if (!project.figure.points[i].enabled)
+                    {
+                        continue;
+                    }
+                    double x = project.figure.points[i].x;
+                    double y = project.figure.points[i].y;
+                    double dist = ((cursorX - x) * (cursorX - x) + (cursorY - y) * (cursorY - y)) / scale;
+                    if (dist < minDist)
+                    {
+                        minDist = dist;
+                        metadata.ToggleOne(i);
+                    }
                 }
-            }
-            if (SelectionChanged != null)
-            {
-                SelectionChanged(this, metadata);
+                if (SelectionChanged != null)
+                {
+                    SelectionChanged(this, metadata);
+                }
             }
             Invalidate();
         }
@@ -310,6 +385,10 @@ class PoseCanvas : Control
         {
             AdjustOffset(e.X, e.Y, 1 / ZoomStep);
             scale /= ZoomStep;
+        }
+        if (boxSelection)
+        {
+            RecalculateBox();
         }
         Invalidate();
     }
