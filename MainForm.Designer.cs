@@ -7,6 +7,10 @@ partial class MainForm
     private Button bCameraReset;
     private Button bRender;
     private ListView lvPoints;
+    private Button bSave;
+    private Button bLoad;
+    private OpenFileDialog ofdLoadProject;
+    private SaveFileDialog sfdSaveProject;
 
     public static Color ColorBlend(Color color, Color backColor, double amount)
     {
@@ -50,6 +54,51 @@ partial class MainForm
         bRender.Click += new EventHandler(RenderImage);
         pToolBox.Controls.Add(bRender);
 
+        sfdSaveProject = new SaveFileDialog()
+        {
+            Filter = "Project files (*.cps)|*.cps",
+            Title = "Save project",
+            CheckPathExists = true,
+        };
+
+        bSave = new Button();
+        bSave.Size = new Size(100, 40);
+        bSave.Location = new Point(30, 130);
+        bSave.Text = "Save Project";
+        bSave.Click += (object sender, System.EventArgs e) =>
+        {
+            if (sfdSaveProject.ShowDialog() == DialogResult.OK)
+            {
+                project.Save(sfdSaveProject.FileName);
+            }
+        };
+        pToolBox.Controls.Add(bSave);
+
+        ofdLoadProject = new OpenFileDialog()
+        {
+            Filter = "Project files (*.cps)|*.cps",
+            Title = "Load project",
+            CheckFileExists = true,
+            CheckPathExists = true,
+        };
+
+        bLoad = new Button();
+        bLoad.Size = new Size(100, 40);
+        bLoad.Location = new Point(30, 180);
+        bLoad.Text = "Load Project";
+        bLoad.Click += (object sender, System.EventArgs e) =>
+        {
+            if (ofdLoadProject.ShowDialog() == DialogResult.OK)
+            {
+                project.Load(ofdLoadProject.FileName);
+                pcCanvas.metadata.ClearSelection();
+                lvPoints.SelectedIndices.Clear();
+                pcCanvas.ResetCamera();
+                pcCanvas.Invalidate();
+            }
+        };
+        pToolBox.Controls.Add(bLoad);
+
         lvPoints = new ListView();
         lvPoints.View = View.Details;
         lvPoints.GridLines = true;
@@ -70,7 +119,7 @@ partial class MainForm
             lvPoints.ClientSize.Width,
             lvPoints.Items[17].Bounds.Bottom
         );
-        lvPoints.Location = new Point(30, 130);
+        lvPoints.Location = new Point(30, 230);
         lvPoints.ItemChecked += new ItemCheckedEventHandler(UpdateCanvasVisibility);
         lvPoints.SelectedIndexChanged += new EventHandler(UpdateCanvasSelection);
         pToolBox.Controls.Add(lvPoints);
