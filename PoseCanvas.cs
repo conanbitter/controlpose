@@ -175,6 +175,26 @@ class PoseCanvas : Control
             (int)(project.canvasFloatWidth / scale),
             (int)(project.canvasFloatHeight / scale));
 
+        if (project.haveImage)
+        {
+            (int imX, int imY) = WorldToScreen(
+                project.imageOffsetX - project.imageFloatWidth * project.imageScale / 2.0,
+                project.imageOffsetY - project.imageFloatHeight * project.imageScale / 2.0
+                );
+            int imWidth = (int)(project.imageFloatWidth * project.imageScale / scale);
+            int imHeight = (int)(project.imageFloatHeight * project.imageScale / scale);
+            //MessageBox.Show($"x: {imX}, y:{imY}, w:{imWidth}, h:{imHeight}");
+            e.Graphics.DrawImage(
+                project.image!,
+                new Rectangle(imX, imY, imWidth, imHeight),
+                0,
+                0,
+                project.imageWidth,
+                project.imageHeight,
+                GraphicsUnit.Pixel,
+                project.imageAttributes);
+        }
+
         Figure fig = project.figure;
 
         for (int i = 0; i < Figure.pairs.Length; i++)

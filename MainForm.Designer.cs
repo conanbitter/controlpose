@@ -9,8 +9,11 @@ partial class MainForm
     private ListView lvPoints;
     private Button bSave;
     private Button bLoad;
+    private Button bAddImage;
+    private Button bRemImage;
     private OpenFileDialog ofdLoadProject;
     private SaveFileDialog sfdSaveProject;
+    private OpenFileDialog ofdLoadImage;
 
     public static Color ColorBlend(Color color, Color backColor, double amount)
     {
@@ -69,7 +72,7 @@ partial class MainForm
         {
             if (sfdSaveProject.ShowDialog() == DialogResult.OK)
             {
-                project.Save(sfdSaveProject.FileName);
+                project.SaveProject(sfdSaveProject.FileName);
             }
         };
         pToolBox.Controls.Add(bSave);
@@ -82,6 +85,7 @@ partial class MainForm
             CheckPathExists = true,
         };
 
+
         bLoad = new Button();
         bLoad.Size = new Size(100, 40);
         bLoad.Location = new Point(30, 180);
@@ -90,7 +94,7 @@ partial class MainForm
         {
             if (ofdLoadProject.ShowDialog() == DialogResult.OK)
             {
-                project.Load(ofdLoadProject.FileName);
+                project.LoadProject(ofdLoadProject.FileName);
                 pcCanvas.metadata.ClearSelection();
                 lvPoints.SelectedIndices.Clear();
                 pcCanvas.ResetCamera();
@@ -98,6 +102,40 @@ partial class MainForm
             }
         };
         pToolBox.Controls.Add(bLoad);
+
+        ofdLoadImage = new OpenFileDialog()
+        {
+
+            Filter = "PNG image (*.png)|*.png|JPEG image (*.jpg;*.jpeg)|*.jpg;*.jpeg",
+            Title = "Load image",
+            CheckFileExists = true,
+            CheckPathExists = true,
+        };
+
+        bAddImage = new Button();
+        bAddImage.Size = new Size(100, 40);
+        bAddImage.Location = new Point(30, 230);
+        bAddImage.Text = "Set Image";
+        bAddImage.Click += (object sender, System.EventArgs e) =>
+        {
+            if (ofdLoadImage.ShowDialog() == DialogResult.OK)
+            {
+                project.LoadImage(ofdLoadImage.FileName);
+                pcCanvas.Invalidate();
+            }
+        };
+        pToolBox.Controls.Add(bAddImage);
+
+        bRemImage = new Button();
+        bRemImage.Size = new Size(100, 40);
+        bRemImage.Location = new Point(30, 280);
+        bRemImage.Text = "Remove Image";
+        bRemImage.Click += (object sender, System.EventArgs e) =>
+        {
+            project.haveImage = false;
+            pcCanvas.Invalidate();
+        };
+        pToolBox.Controls.Add(bRemImage);
 
         lvPoints = new ListView();
         lvPoints.View = View.Details;
@@ -119,7 +157,7 @@ partial class MainForm
             lvPoints.ClientSize.Width,
             lvPoints.Items[17].Bounds.Bottom
         );
-        lvPoints.Location = new Point(30, 230);
+        lvPoints.Location = new Point(30, 330);
         lvPoints.ItemChecked += new ItemCheckedEventHandler(UpdateCanvasVisibility);
         lvPoints.SelectedIndexChanged += new EventHandler(UpdateCanvasSelection);
         pToolBox.Controls.Add(lvPoints);

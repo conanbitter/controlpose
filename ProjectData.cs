@@ -1,3 +1,5 @@
+using System.Drawing.Imaging;
+
 public class ProjectData
 {
     private int _canwasWidth = 512;
@@ -6,38 +8,71 @@ public class ProjectData
     public double canvasFloatWidth { get; private set; } = 1.0;
     public double canvasFloatHeight { get; private set; } = 1.0;
 
+    public Image? image;
+    public bool haveImage = false;
+    public int imageWidth;
+    public int imageHeight;
+    public double imageFloatWidth;
+    public double imageFloatHeight;
+    public double imageScale;
+    public double imageOffsetX;
+    public double imageOffsetY;
+    //public double 
+    private ColorMatrix colorMatrix;
+    public ImageAttributes imageAttributes;
+
     public int canvasWidth
     {
         get { return _canwasWidth; }
-        set { _canwasWidth = value; updateAR(); }
+        set { _canwasWidth = value; (canvasFloatWidth, canvasFloatHeight) = updateAR(_canwasWidth, _canwasHeight); }
     }
     public int canvasHeight
     {
         get { return _canwasHeight; }
-        set { _canwasHeight = value; updateAR(); }
+        set { _canwasHeight = value; (canvasFloatWidth, canvasFloatHeight) = updateAR(_canwasWidth, _canwasHeight); }
     }
 
     public ProjectData()
     {
         figure = new Figure();
         figure.ResetPose();
+        colorMatrix = new ColorMatrix();
+        colorMatrix.Matrix33 = 0.5f;
+        imageAttributes = new ImageAttributes();
+        imageAttributes.SetColorMatrix(
+            colorMatrix,
+            ColorMatrixFlag.Default,
+            ColorAdjustType.Bitmap
+        );
     }
 
-    private void updateAR()
+    private (double, double) updateAR(int width, int height)
     {
-        if (canvasWidth > canvasHeight)
+        if (width > height)
         {
-            canvasFloatHeight = 1.0;
-            canvasFloatWidth = (double)canvasWidth / (double)canvasHeight;
+            return ((double)width / (double)height, 1.0);
         }
-        else if (canvasWidth < canvasHeight)
+        if (width < height)
         {
-            canvasFloatWidth = 1.0;
-            canvasFloatHeight = (double)canvasHeight / (double)canvasWidth;
+            return (1.0, (double)height / (double)width);
         }
+        return (1.0, 1.0);
     }
 
-    public void Save(string filename)
+    public void LoadImage(string filename)
+    {
+        image = Image.FromFile(filename);
+        imageWidth = image.Width;
+        imageHeight = image.Height;
+        (imageFloatWidth, imageFloatHeight) = updateAR(imageWidth, imageHeight);
+        imageOffsetX = 0.0;
+        imageOffsetY = 0.0;
+        imageScale = 1.0;
+        //MessageBox.Show($"w: {imageWidth}, h:{imageHeight}, fw:{imageFloatWidth}, fh:{imageFloatHeight}");
+        haveImage = true;
+    }
+
+    public void SaveProject(string filename)
     {
         using (BinaryWriter file = new BinaryWriter(new FileStream(filename, FileMode.Create)))
         {
@@ -58,7 +93,7 @@ public class ProjectData
         }
     }
 
-    public void Load(string filename)
+    public void LoadProject(string filename)
     {
         using (BinaryReader file = new BinaryReader(new FileStream(filename, FileMode.Open)))
         {
