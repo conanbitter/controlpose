@@ -163,6 +163,7 @@ class PoseCanvas : Control
         base.OnPaint(e);
         e.Graphics.Clear(BackgroundColor);
         e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+        e.Graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
         brush.Color = Color.Black;
 
         (int canvasOffsetX, int canvasOffsetY) = WorldToScreen(0.5 - project.canvasFloatWidth, 0.5 - project.canvasFloatHeight);
