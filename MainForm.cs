@@ -62,9 +62,8 @@ public partial class MainForm : Form
         if (selectionChanged)
         {
             UpdateListSelection(this, pcCanvas.metadata);
-            pcCanvas.Invalidate();
         }
-
+        pcCanvas.Invalidate();
     }
 
     public void UpdateCanvasSelection(object sender, System.EventArgs e)

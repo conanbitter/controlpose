@@ -75,8 +75,6 @@ class PoseCanvas : Control
     private int oldy = 0;
 
     private bool pointMoving = false;
-    private double oldPointX = 0.0;
-    private double oldPointY = 0.0;
     private double oldCursorX = 0.0;
     private double oldCursorY = 0.0;
 
