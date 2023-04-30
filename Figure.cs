@@ -91,8 +91,8 @@ public class Figure
         Color.FromArgb(  0,   0, 255),
         Color.FromArgb(85,    0, 255),
         Color.FromArgb(170,   0, 255),
-        Color.FromArgb(255,   0, 170),
         Color.FromArgb(255,   0, 255),
+        Color.FromArgb(255,   0, 170),
         Color.FromArgb(255,   0,  85),
     };
 

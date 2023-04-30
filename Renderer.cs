@@ -60,7 +60,7 @@ class Renderer
             {
                 continue;
             }
-            brush.Color = Color.FromArgb(153, Figure.pointColors[i]);
+            brush.Color = Color.FromArgb(255, Figure.pointColors[i]);
             double x = (figure.points[i].x + 0.5) * canvasWidth;
             double y = (figure.points[i].y + 0.5) * canvasHeight;
             gfx.FillEllipse(brush,
